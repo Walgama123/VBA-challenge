@@ -1,0 +1,81 @@
+Public Sub FindGereatestValues(ws As Worksheet)
+
+'This procedure is used to find the greatest values
+Dim wsName      As String
+Dim lastRow     As Double
+Dim dataColumn  As Range
+Dim CurrentRow  As Double
+Dim PrintRow    As Double
+
+Dim GrstIncreasedTicker As String
+Dim GrstDecreasedTicker As String
+Dim GrstVolumeTicker    As String
+
+Dim GreatestIncreased As Double
+Dim GreatestDecreased As Double
+Dim GreatestVolume    As Double
+
+    PrintRow = 4
+    ws.Cells(3, 16).Value = "Ticker"
+    ws.Cells(3, 17).Value = "Value"
+     
+    'Initialize the greatest values for eaach years
+    GrstIncreasedTicker = ws.Cells(4, 9).Value
+    GrstDecreasedTicker = ws.Cells(4, 9).Value
+    GrstVolumeTicker = ws.Cells(4, 9).Value
+
+    GreatestIncreased = ws.Cells(4, 11).Value
+    GreatestDecreased = ws.Cells(4, 11).Value
+    GreatestVolume = ws.Cells(4, 12).Value
+     
+     'Specify the Data available column
+      Set dataColumn = ws.Range("I:I")
+        
+     ' Find the last row with data in the specified column
+     lastRow = ws.Cells(ws.Rows.Count, dataColumn.Column).End(xlUp).Row
+                         
+            'Iterate all the rows in the current worksheet
+            For CurrentRow = 4 To lastRow
+            
+                'Find the GreatestIncreased values
+                    If GreatestIncreased <= ws.Cells(CurrentRow, 11).Value Then
+                        GreatestIncreased = ws.Cells(CurrentRow, 11).Value
+                        GrstIncreasedTicker = ws.Cells(CurrentRow, 9).Value
+                                    
+                    End If
+                    
+                    'Find the GrstDecreasedTicker values
+                    If ws.Cells(CurrentRow, 11).Value <= GreatestDecreased Then
+                        GreatestDecreased = ws.Cells(CurrentRow, 11).Value
+                        GrstDecreasedTicker = ws.Cells(CurrentRow, 9).Value
+                            
+                    End If
+                    
+                    'Find the GreatestVolume values
+                    If GreatestVolume <= ws.Cells(CurrentRow, 12) Then
+                        GreatestVolume = ws.Cells(CurrentRow, 12)
+                        GrstVolumeTicker = ws.Cells(CurrentRow, 9).Value
+                     End If
+                       
+            
+            Next CurrentRow
+'Print the greatest values
+ ws.Cells(4, 15).Value = "Greatest % Increased"
+ ws.Cells(5, 15).Value = "Greatest % Decreased"
+ ws.Cells(6, 15).Value = "Greatest Total Volume"
+ 
+ ws.Cells(4, 16).Value = GrstIncreasedTicker
+ ws.Cells(5, 16).Value = GrstDecreasedTicker
+ ws.Cells(6, 16).Value = GrstVolumeTicker
+ 
+ ws.Cells(4, 17).Value = GreatestIncreased
+ ws.Cells(5, 17).Value = GreatestDecreased
+ ws.Cells(6, 17).Value = GreatestVolume
+ 
+ ws.Cells(4, 17).NumberFormat = "0.00%"
+ ws.Cells(5, 17).NumberFormat = "0.00%"
+ ws.Cells(6, 17).NumberFormat = "#,##0"
+ ws.Range("O4", "q4").Interior.ColorIndex = 4
+ ws.Range("O5", "q5").Interior.ColorIndex = 3
+
+End Sub

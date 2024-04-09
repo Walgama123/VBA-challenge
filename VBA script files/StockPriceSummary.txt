@@ -1,0 +1,124 @@
+Sub StockPriceSummary()
+
+Dim ws As Worksheet
+Dim wsName As String
+Dim lastRow As Double
+Dim dataColumn As Range
+Dim CurrentRow As Double
+
+'Transaction variables
+Dim OpeningPrice    As Double
+Dim ClosingPrice    As Double
+Dim YearlyChange    As Double
+Dim PercentChange   As Double
+Dim TotalStockVoule As Double
+Dim RecordsperTicker As Double
+Dim PrintRow         As Double
+
+'Initialize the variables
+OpeningPrice = 0
+ClosingPrice = 0
+YearlyChange = 0
+PercentChange = 0
+TotalStockVoule = 0
+
+'Itereate the all the records in the workbook
+For Each ws In ThisWorkbook.Worksheets
+
+        'Initialize variable to the first row of the summary printing.
+        PrintRow = 4
+
+        'Rename the new columns
+        ws.Cells(3, 9).Value = "Ticker"
+        ws.Cells(3, 10).Value = "Yearly Change"
+        ws.Cells(3, 11).Value = "Percent Change"
+        ws.Cells(3, 12).Value = "Total Stock Voule"
+       
+        
+        
+        'Specify the Data available column to find out the number of recortds in each sheets.
+        Set dataColumn = ws.Range("A:A")
+        
+        ' Find the last row with data in the specified column
+        lastRow = ws.Cells(ws.Rows.Count, dataColumn.Column).End(xlUp).Row
+        
+        'Application.StatusBar = False
+        
+            'Iterate all the rows in the current worksheet.
+            For CurrentRow = 4 To lastRow
+            
+            'Application.StatusBar = "Progress: " & ws.Name & " " & CurrentRow & " of lastRow: " & Format(CurrentRow / lastRow, "0%")
+            
+            
+            'Yearly Change = Closing Price - Opening Price
+            'Percentage Change = (Yearly Change / Opening Price) * 100
+            'Total Stock Volume = Sum of Volume for all Trading Days
+                
+                'Check whether the ticker has change.
+                If ws.Cells(CurrentRow + 1, 1).Value <> ws.Cells(CurrentRow, 1).Value Then
+                    
+                    'Sumup the last row value to the current ticker to the total.
+                    TotalStockVoule = TotalStockVoule + ws.Cells(CurrentRow, 7).Value
+                    
+                    'Find the Opening Price
+                    RecordsperTicker = RecordsperTicker + 1
+                    OpeningPrice = ws.Cells((CurrentRow - RecordsperTicker + 1), 3).Value
+                                       
+                    'Closing price of the ticker
+                    ClosingPrice = ws.Cells(CurrentRow, 3).Value
+                                                        
+                    'Calculate measures
+                    YearlyChange = ClosingPrice - OpeningPrice
+                    PercentChange = (YearlyChange / OpeningPrice)
+                                     
+                    'Print summary data in the sheet
+                    ws.Cells(PrintRow, 9) = ws.Cells(CurrentRow, 1).Value
+                    ws.Cells(PrintRow, 10) = YearlyChange
+                    ws.Cells(PrintRow, 11) = PercentChange
+                    ws.Cells(PrintRow, 12) = TotalStockVoule
+                    
+                    'Fomat rows
+                    ws.Cells(PrintRow, 11).NumberFormat = "0.00%"
+                        
+                        'Asign the color code as per the postive and negative of YearlyChange
+                        If YearlyChange < 0 Then
+                           ws.Cells(PrintRow, 10).Interior.ColorIndex = 3
+                           'ws.Cells(PrintRow, 10).AddPicture = "decrease.png"
+                           'ws.Shapes.AddPicture "path_to_no_icon.jpg", msoFalse, msoCTrue, cell.Left, cell.Top, 20, 20
+                            'Set Image = ws.Pictures.Insert("decrease.png")
+                            'Image.Top = ws.Cells(PrintRow, 10).Top
+                            'Image.Left = ws.Cells(PrintRow, 10).Left
+                            'Image.ShapeRange.Height = 45
+                            'Image.ShapeRange.Width = 75
+                           
+                        Else
+                           ws.Cells(PrintRow, 10).Interior.ColorIndex = 4
+                        End If
+                         
+                    
+                    'Initialize the running variables for the next Ticker
+                    TotalStockVoule = 0
+                    OpeningPrice = 0
+                    ClosingPrice = 0
+                    YearlyChange = 0
+                    PercentChange = 0
+                    RecordsperTicker = 0
+                    PrintRow = PrintRow + 1
+                    
+    
+                Else
+                    'Sumup the daily stock value per ticker
+                    TotalStockVoule = TotalStockVoule + ws.Cells(CurrentRow, 7).Value
+                    'keep updating number of records per ticker
+                    RecordsperTicker = RecordsperTicker + 1
+    
+                End If
+            Next CurrentRow
+            
+'Print the Greatest values
+Call FindGereatestValues(ws)
+'Go to the next work sheet
+Next ws
+MsgBox ("Process compleated")
+
+End Sub

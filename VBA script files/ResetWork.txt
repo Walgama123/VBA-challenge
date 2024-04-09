@@ -1,0 +1,9 @@
+Public Sub ResetWork()
+Dim ws As Worksheet
+Dim wsName As String
+
+For Each ws In ThisWorkbook.Worksheets
+    ws.Columns("H:U").Delete
+Next ws
+
+End Sub
